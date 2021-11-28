@@ -1,0 +1,150 @@
+{
+    "products": [
+        {
+            "id": 1,
+            "brand": "ADIDAS",
+            "types": [
+                {
+                    "name": "NMD",
+                    "models": [
+                        {
+                            "id": 2,
+                            "name": "NMD_R1",
+                            "price": 500000,
+                            "quantity": {
+                                "S": 20,
+                                "M": 10,
+                                "L": 10
+                            },
+                            "image": "abc"
+                        },
+                        {
+                            "id": 3,
+                            "name": "NMD_R2 V2",
+                            "price": 280000,
+                            "quantity": {
+                                "S": 15,
+                                "M": 5,
+                                "L": 25
+                            },
+                            "image": "def"
+                        }
+                    ]
+                },
+                {
+                    "name": "ULTRA BOOST",
+                    "models": [
+                        {
+                            "id": 4,
+                            "name": "ULTRA BOOST 21",
+                            "price": 1600000,
+                            "quantity": {
+                                "S": 20,
+                                "M": 10,
+                                "L": 10
+                            },
+                            "image": "abc"
+                        },
+                        {
+                            "id": 5,
+                            "name": "ULTRA BOOST 4.0",
+                            "price": 1800000,
+                            "quantity": {
+                                "S": 15,
+                                "M": 5,
+                                "L": 25
+                            },
+                            "image": "def"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "brand": "NIKE",
+            "types": [
+                {
+                    "name":"AIR MAX",
+                    "models": [
+                        {
+                            "id": 7,
+                            "name": "AIR MAX 2020",
+                            "price": 3200000,
+                            "quantity": {
+                                "S": 70,
+                                "M": 50,
+                                "L": 50
+                            },
+                            "image": "abc"
+                        },
+                        {
+                            "id": 8,
+                            "name": "AIR MAX 2021 LIMITED",
+                            "price": 5600000,
+                            "quantity": {
+                                "S": 15,
+                                "M": 5,
+                                "L": 25
+                            },
+                            "image": "def"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+
+    "histories":[
+        {
+            "id": 1,
+            "in_out": 1,
+            "products":[
+                {
+                    "id": 7,
+                    "brand":"NIKE",
+                    "type": "AIR MAX",
+                    "model": "AIR MAX 2020",
+                    "detail": [
+                        {
+                            
+                            "size": "XL",
+                            "quantity": 10
+                        },
+                        {
+                            "size": "M",
+                            "quantity": 20
+                        }
+                    ]
+                }
+            ],
+            "staff":"DEF345",
+            "date":"2020-12-28"
+        },
+        {
+            "id": 2,
+            "in_out": 0,
+            "products":[
+                {
+                    "id": 2,
+                    "brand":"ADIDAS",
+                    "type": "NMD",
+                    "model": "NMD_R1",
+                    "detail": [
+                        {
+                            
+                            "size": "XL",
+                            "quantity": 5
+                        },
+                        {
+                            "size": "M",
+                            "quantity": 25
+                        }
+                    ]
+                }
+            ],
+            "staff":"ABC123",
+            "date":"2021-5-20"
+        }
+    ]
+}
