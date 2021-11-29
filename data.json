@@ -11,22 +11,40 @@
                             "id": 2,
                             "name": "NMD_R1",
                             "price": 500000,
-                            "quantity": {
-                                "S": 20,
-                                "M": 10,
-                                "L": 10
-                            },
+                            "quantities": [
+                                {
+                                    "size": 40,
+                                    "quantity": 32
+                                },
+                                {
+                                    "size": 42,
+                                    "quantity": 25
+                                },
+                                {
+                                    "size": 43,
+                                    "quantity": 4
+                                }
+                            ],
                             "image": "abc"
                         },
                         {
                             "id": 3,
                             "name": "NMD_R2 V2",
                             "price": 280000,
-                            "quantity": {
-                                "S": 15,
-                                "M": 5,
-                                "L": 25
-                            },
+                            "quantities": [
+                                {
+                                    "size": 41,
+                                    "quantity": 56
+                                },
+                                {
+                                    "size": 42,
+                                    "quantity": 42
+                                },
+                                {
+                                    "size": 44,
+                                    "quantity": 53
+                                }
+                            ],
                             "image": "def"
                         }
                     ]
@@ -38,22 +56,40 @@
                             "id": 4,
                             "name": "ULTRA BOOST 21",
                             "price": 1600000,
-                            "quantity": {
-                                "S": 20,
-                                "M": 10,
-                                "L": 10
-                            },
+                            "quantities": [
+                                {
+                                    "size": 38,
+                                    "quantity": 25
+                                },
+                                {
+                                    "size": 40,
+                                    "quantity": 51
+                                }
+                            ],
                             "image": "abc"
                         },
                         {
                             "id": 5,
                             "name": "ULTRA BOOST 4.0",
                             "price": 1800000,
-                            "quantity": {
-                                "S": 15,
-                                "M": 5,
-                                "L": 25
-                            },
+                            "quantities": [
+                                {
+                                    "size": 39,
+                                    "quantity": 46
+                                },
+                                {
+                                    "size": 40,
+                                    "quantity": 14
+                                },
+                                {
+                                    "size": 42,
+                                    "quantity": 42
+                                },
+                                {
+                                    "size": 43,
+                                    "quantity": 10
+                                }
+                            ],
                             "image": "def"
                         }
                     ]
@@ -71,22 +107,40 @@
                             "id": 7,
                             "name": "AIR MAX 2020",
                             "price": 3200000,
-                            "quantity": {
-                                "S": 70,
-                                "M": 50,
-                                "L": 50
-                            },
+                            "quantities": [
+                                {
+                                    "size": 41,
+                                    "quantity": 70
+                                },
+                                {
+                                    "size": 42,
+                                    "quantity": 40
+                                },
+                                {
+                                    "size": 43,
+                                    "quantity": 0
+                                }
+                            ],
                             "image": "abc"
                         },
                         {
                             "id": 8,
                             "name": "AIR MAX 2021 LIMITED",
                             "price": 5600000,
-                            "quantity": {
-                                "S": 15,
-                                "M": 5,
-                                "L": 25
-                            },
+                            "quantities": [
+                                {
+                                    "size": 38,
+                                    "quantity": 25
+                                },
+                                {
+                                    "size": 41,
+                                    "quantity": 54
+                                },
+                                {
+                                    "size": 42,
+                                    "quantity": 14
+                                }
+                            ],
                             "image": "def"
                         }
                     ]
@@ -102,17 +156,14 @@
             "products":[
                 {
                     "id": 7,
-                    "brand":"NIKE",
-                    "type": "AIR MAX",
-                    "model": "AIR MAX 2020",
                     "detail": [
                         {
                             
-                            "size": "XL",
+                            "size": 41,
                             "quantity": 10
                         },
                         {
-                            "size": "M",
+                            "size": 42,
                             "quantity": 20
                         }
                     ]
@@ -127,17 +178,14 @@
             "products":[
                 {
                     "id": 2,
-                    "brand":"ADIDAS",
-                    "type": "NMD",
-                    "model": "NMD_R1",
                     "detail": [
                         {
                             
-                            "size": "XL",
+                            "size": 38,
                             "quantity": 5
                         },
                         {
-                            "size": "M",
+                            "size": 42,
                             "quantity": 25
                         }
                     ]

@@ -140,4 +140,87 @@ router.get('/history/:model', (request, response) => {
     response.send(result)
 })
 
+router.post('/add/brand', (request, response) => {
+    const new_product = request.body.brand
+    const status = true
+
+    const index = products.findIndex(product => product.brand == new_product.brand)
+    if(index !== -1)
+    {
+        products.push({ id: products.length + 1, brand: new_product.brand, types: [] })
+    }else{
+        status = false
+    }
+
+    response.send({ status: status, ...products })
+})
+
+router.post('/add/type', (request, response) => {
+    const new_product = request.body.type
+    const status = true
+
+    const index = products.findIndex(product => product.brand == new_product.brand)
+    
+    if(index !== -1)
+    {
+        const index2 = products[index].types.findIndex(type => type.name == new_product.name)
+        if(index2 !== -1)
+        {
+            status = false
+        }else{
+            products[index].types.push({ name: new_product.name, models: [] })
+        }
+    }else{
+        status = false
+    }
+
+    response.send({ status: status, ...products })
+})
+
+router.post('/add/model', (request, response) => {
+    const new_product = request.body.model
+    const status = true
+
+    const index = products.findIndex(product => product.brand == new_product.brand)
+    
+    if(index !== -1)
+    {
+        const index2 = products[index].types.findIndex(type => type.name == new_product.name)
+        if(index2 !== -1)
+        {
+            const index3 = products[index].types[index2].models.findIndex(model => model.name == new_product.model_name)
+            if(index3 !== -1)
+            {
+                status = false
+            }else{
+                products[index].types[index2].models.push(
+                { 
+                    id: new_product.id,
+                    name: new_product.model_name,
+                    price: new_product.price,
+                    quantities: [...new_product.quantities],
+                    image: new_product.image 
+                })
+            }
+        }else{
+            const new_model = { 
+                id: new_product.id,
+                name: new_product.model_name,
+                price: new_product.price,
+                quantities: [...new_product.quantities],
+                image: new_product.image 
+            }
+            const new_type = {
+                name: new_product.type_name,
+                models: [new_model],
+            }
+            products[index].types.push(new_type)
+        }
+    }else{
+        status = false
+    }
+
+    response.send({ status: status, ...products })
+})
+
 module.exports = router
