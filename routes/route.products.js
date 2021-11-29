@@ -216,9 +216,8 @@ router.post('/add/model', (request, response) => {
             }
             products[index].types.push(new_type)
         }
-    }else{
+    }else
         status = false
-    }
 
     response.send({ status: status, ...products })
 })
