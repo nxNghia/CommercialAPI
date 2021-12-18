@@ -7,3 +7,12 @@
 ```
 npm install
 ```
+## Usage
+### Run server
+```
+npm run dev
+```
+### Run client
+```
+npm run client
+```
