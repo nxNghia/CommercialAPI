@@ -1,10 +1,22 @@
 const express = require('express')
-const app = express()
+const mongoose = require('mongoose')
+
 const productRouter = require('./routes/route.products')
 const historyRouter = require('./routes/route.history')
 
 const port = process.env.PORT || 8000
+const mongoURL = process.env.MONGOURL || 'mongodb://localhost:27017/CommercialAPI'
 
+try {
+    mongoose.connect(
+        mongoURL,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+    )
+}catch{
+    console.log('failed')
+}
+
+const app = express()
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 

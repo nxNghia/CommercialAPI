@@ -1,3 +1,11 @@
-const data = require('../data.json')
+const mongoose = require('mongoose')
 
-module.exports = data.products
+const productsSchema = new mongoose.Schema({
+    name: String,
+    quantity: Number,
+    price: Number
+})
+
+const Product = mongoose.model('Products', productsSchema)
+
+module.exports = Product
