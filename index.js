@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const con = require('./database')
+const { con } = require('./database')
 const axios = require('axios')
 
 const port = process.env.PORT || 8000
