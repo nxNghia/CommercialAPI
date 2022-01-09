@@ -20,21 +20,23 @@ const convertDate = (date) => {
     return _date.getDate() + '/' + (_date.getMonth() + 1) + '/' + _date.getFullYear()
 }
 
-app.get('/statistics/storage/:storage', (req, res) => {
-    const storage_id = req.params.storage
+// get information of products that are stored in a particular warehouse
+app.get('/statistics/warehouse/:warehouse', (req, res) => {
+    const warehouse_id = req.params.warehouse
 
-    con.query(`SELECT * FROM product WHERE warehouse_id=${storage_id}`, (err, result) => {
+    con.query(`SELECT * FROM product WHERE warehouse_id=${warehouse_id}`, (err, result) => {
         const list = result?.map(item => ({...item, last_update: convertDate(item.last_update)}))
         res.status(200).send(list)
     })
 })
 
-app.get('/statistics/product/:id/:storage', (req, res) => {
+// for transferring reason, this api return information of particular product that stored in other warehouses
+app.get('/statistics/product/:id/:warehouse', (req, res) => {
     const product_id = req.params.id
-    const storage_id = req.params.storage
+    const warehouse_id = req.params.warehouse
 
     con.query(`SELECT P.id, P.quantity, P.warehouse_id, W.name, P.last_update FROM product AS P, warehouse AS W
-        WHERE P.id='${product_id}' AND P.warehouse_id!=${storage_id} AND P.warehouse_id = W.id`, (err, result) => {
+        WHERE P.id='${product_id}' AND P.warehouse_id!=${warehouse_id} AND P.warehouse_id = W.id`, (err, result) => {
         const list = result?.map(item => ({...item, last_update: convertDate(item.last_update)}))
         res.status(200).send(list)
     })
@@ -46,7 +48,7 @@ const reasonConstances = {
     3: 'Đổi hàng'
 }
 
-//Thông tin những hàng bị trả lại
+// get information about returned product 
 app.get('/statistics/product/returned', (req, res) => {
     con.query(`SELECT * FROM return ORDER BY date DESC`, (err, result) => {
         const returnedList = []
@@ -67,10 +69,10 @@ app.get('/statistics/product/returned', (req, res) => {
     })
 })
 
-//Thống kê doanh thu theo kho
-app.get('/statistics/profit/:storage', (req, res) => {
-    const storage_id = req.params.storage
-    con.query(`SELECT product_id, quantity FROM it4492_2.export AS E, export_detail WHERE E.from=${storage_id} AND E.to=1 AND E.id = export_detail.export_id`, (err, result) => {
+// get profit correspond to each warehouse
+app.get('/statistics/profit/:warehouse', (req, res) => {
+    const warehouse_id = req.params.warehouse
+    con.query(`SELECT product_id, quantity FROM it4492_2.export AS E, export_detail WHERE E.from=${warehouse_id} AND E.to=1 AND E.id = export_detail.export_id`, (err, result) => {
             const products = []
 
             result?.forEach(product => {
@@ -96,20 +98,22 @@ app.get('/statistics/profit/:storage', (req, res) => {
         })
 })
 
-app.get('/storage', (req, res) => {
+app.get('/warehouse', (req, res) => {
     con.query(`SELECT * FROM warehouse`, (err, result) => {
-        const list = result.filter(storage => storage.id !== 1)
+        const list = result.filter(warehouse => warehouse.id !== 1)
 
         res.send(list)
     })
 })
 
+// get total quantity ò each product, which is stored in every warehouse
 app.get('/statistics/product', (req, res) => {
     con.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`, (err, result) => {
         res.send(result)
     })
 })
 
+// add product into warehouse
 app.post('/product/add', (req, res) => {
     const new_product = {
         id: req.body.id,
