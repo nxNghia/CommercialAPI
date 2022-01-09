@@ -5,7 +5,8 @@ const con = mysql.createConnection({
     user: 'root',
     password: '123456789',
     database: 'it4492_2',
-    port: 3306
+    port: 3306,
+    timeout: 60000
     // host: 'sql6.freesqldatabase.com',
     // user: 'sql6462262',
     // password: 'K1JKyt4uFq',
