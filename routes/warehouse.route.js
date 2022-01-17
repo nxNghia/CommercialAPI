@@ -50,11 +50,17 @@ router.get('/profit/:warehouse', async (req, res) => {
 
 // get information of warehouses
 router.get('/', async (req, res) => {
-    const result = await pool.query(`SELECT * FROM warehouse`)
+    try
+    {
+        const result = await pool.query(`SELECT * FROM warehouse`)
     
-    const list = result.rows.filter(warehouse => warehouse.id !== 1)
+        const list = result.rows.filter(warehouse => warehouse.id !== 1)
 
-    res.send(list)
+        res.send(list)
+    }catch (err)
+    {
+        res.send(err)
+    }
 })
 
 module.exports = router
