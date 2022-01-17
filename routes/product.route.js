@@ -11,13 +11,22 @@ const convertDate = (date) => {
 
 // for transferring reason, this api return information of particular product that stored in other warehouses
 router.get('/:id', async (req, res) => {
-    const product_id = req.params.id
+    try
+    {
+        const product_id = req.params.id
 
-    const result = await pool.query(`SELECT P.id, P.quantity, P.warehouse_id, W.name, P.last_update FROM product AS P, warehouse AS W
-        WHERE P.id='${product_id}' AND P.warehouse_id = W.id`)
-    
-    const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
-    res.status(200).send(list)
+        if (product_id.includes(' '))
+            res.status(400).send({ message: "Parameter contains space" })
+
+        const result = await pool.query(`SELECT P.id, P.quantity, P.warehouse_id, W.name, P.last_update FROM product AS P, warehouse AS W
+            WHERE P.id='${product_id}' AND P.warehouse_id = W.id`)
+        
+        const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
+        res.status(200).send(list)
+    }catch (err)
+    {
+        res.status(400).send({ message: "Failed" })
+    }
 })
 
 const reasonConstances = {
@@ -28,35 +37,40 @@ const reasonConstances = {
 
 // get information about returned product 
 router.get('/returned', async (req, res) => {
-    const result = await pool.query(`SELECT * FROM return ORDER BY date DESC`)
+    try
+    {
+        const result = await pool.query(`SELECT * FROM return ORDER BY date DESC`)
     
-    const returnedList = []
-    result?.rows.forEach(product => {
-        returnedList.push({
-            product_id: product.product_id,
-            return_to: product.return_to,
-            reason: {
-                value: product.reason,
-                text: reasonConstances[product.reason]
-            },
-            quantity: product.quantity,
-            date: convertDate(product.date)
-        })
-    });
+        const returnedList = []
+        result?.rows.forEach(product => {
+            returnedList.push({
+                product_id: product.product_id,
+                return_to: product.return_to,
+                reason: {
+                    value: product.reason,
+                    text: reasonConstances[product.reason]
+                },
+                quantity: product.quantity,
+                date: convertDate(product.date)
+            })
+        });
 
-    res.status(200).send(returnedList)
+        res.status(200).send(returnedList)
+    }catch (err) {
+        res.status(400).send({ message: "Failed" })
+    }
 })
 
 // get total quantity of each product, which is stored in every warehouse
 router.get('/', async (req, res) => {
     try
     {
-        const result = await pool.query(`SELECT id, SUM(quantity), last_update as quantity FROM product GROUP BY id`)
+        const result = await pool.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`)
     
         res.send(result.rows)
     }catch (err)
     {
-        res.send(err)
+        res.status(400).send({ message: "Failed" })
     }
 })
 
