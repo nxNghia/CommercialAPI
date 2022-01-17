@@ -51,7 +51,7 @@ router.get('/returned', async (req, res) => {
 router.get('/', async (req, res) => {
     try
     {
-        const result = await pool.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`)
+        const result = await pool.query(`SELECT id, SUM(quantity), last_update as quantity FROM product GROUP BY id`)
     
         res.send(result.rows)
     }catch (err)
