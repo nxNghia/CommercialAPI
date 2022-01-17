@@ -60,10 +60,7 @@ router.get('/profit/:warehouse', async (req, res) => {
             total: result.reduce((current, next) => {
                 return current + next.profit
             }, 0)
-        })).catch(err)
-        {
-            res.status(400).send({ message: 'Failed' })
-        }
+        }))
     }catch (err)
     {
         res.status(400).send({ message: 'Failed' })

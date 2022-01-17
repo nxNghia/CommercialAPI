@@ -5,9 +5,9 @@ const proConfig = process.env.DATABASE_URL
 
 const pool = new Pool({
     connectionString: process.env.NODE_ENV === 'production' ? proConfig : devConfig,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: true
+    } : false
 })
 
 module.exports = pool
