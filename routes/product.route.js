@@ -10,7 +10,7 @@ const convertDate = (date) => {
 }
 
 // for transferring reason, this api return information of particular product that stored in other warehouses
-router.get('/:id', async (req, res) => {
+router.get('/getById/:id', async (req, res) => {
     try
     {
         const product_id = req.params.id
