@@ -39,7 +39,7 @@ const reasonConstances = {
 router.get('/returned', async (req, res) => {
     try
     {
-        const result = await pool.query(`SELECT * FROM return ORDER BY date DESC`)
+        const result = await pool.query(`SELECT * FROM "return" ORDER BY date DESC`)
     
         const returnedList = []
         result?.rows.forEach(product => {
