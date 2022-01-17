@@ -19,8 +19,8 @@ app.use(cors({
 app.listen(port, () => console.log(`Running on port ${port}`))
 const pool= require('./database')
 
-// app.use('/product', productRouter);
-// app.use('/warehouse', warehouseRouter);
+app.use('/product', productRouter);
+app.use('/warehouse', warehouseRouter);
 
 app.get('/get', async (request, response) => {
     try
