@@ -19,7 +19,7 @@ router.get('/:warehouse', async (req, res) => {
         if (warehouse_id.includes(' '))
             res.status(400).send({ message: 'Parameter contains space' })
 
-        const result = await pool.query(`SELECT id, quantity FROM product WHERE warehouse_id=${warehouse_id}`)
+        const result = await pool.query(`SELECT id, quantity, last_update FROM product WHERE warehouse_id=${warehouse_id}`)
 
         const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
         res.status(200).send(list)
