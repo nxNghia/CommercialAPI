@@ -49,9 +49,15 @@ router.get('/returned', async (req, res) => {
 
 // get total quantity of each product, which is stored in every warehouse
 router.get('/', async (req, res) => {
-    const result = await pool.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`)
+    try
+    {
+        const result = await pool.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`)
     
-    res.send(result.rows)
+        res.send(result.rows)
+    }catch (err)
+    {
+        res.send(err)
+    }
 })
 
 module.exports = router
