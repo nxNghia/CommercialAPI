@@ -1,29 +1,26 @@
-const mysql = require('mysql')
+require('dotenv').config()
+// const mysql = require('mysql')
 
-const con = mysql.createConnection({
-    host: 'ltct.cws03zhgrjni.ap-southeast-1.rds.amazonaws.com',
-    user: 'root',
-    password: '123456789',
-    database: 'it4492_2',
-    port: 3306,
-    timeout: 60000
-    // host: 'sql6.freesqldatabase.com',
-    // user: 'sql6462262',
-    // password: 'K1JKyt4uFq',
-    // database: database
-})
+// const con = mysql.createConnection({
+//     host: 'ltct.cws03zhgrjni.ap-southeast-1.rds.amazonaws.com',
+//     user: 'root',
+//     password: '123456789',
+//     database: 'it4492_2',
+//     port: 3306,
+//     timeout: 60000
+// })
 
 //phpmyadmin: http://www.phpmyadmin.co
 
-con.connect(err => {
-    if (err) throw err
+// con.connect(err => {
+//     if (err) throw err
 
-    console.log("connected")
-})
+//     console.log("connected")
+// })
 
-module.exports = {
-    con
-}
+// module.exports = {
+//     con
+// }
 
 // const sqlite3 = require('sqlite3')
 
@@ -83,3 +80,14 @@ module.exports = {
 // }
 
 // module.exports = sqlite
+
+const Pool = require('pg').Pool
+
+const devConfig = `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_DATABASE}`
+const proConfig = process.env.DATABSE_URL
+
+const pool = new Pool({
+    connectionString: process.env.NODE_ENV === 'production' ? proConfig : devConfig
+})
+
+module.exports = pool
