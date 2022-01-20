@@ -25,7 +25,7 @@ router.get('/getById/:id', async (req, res) => {
         res.status(200).send(list)
     }catch (err)
     {
-        res.status(400).send({ message: "Failed" })
+        res.status(400).send({ message: "Failed", error: err })
     }
 })
 
@@ -57,7 +57,7 @@ router.get('/returned', async (req, res) => {
 
         res.status(200).send(returnedList)
     }catch (err) {
-        res.status(400).send({ message: "Failed" })
+        res.status(400).send({ message: "Failed", error: err })
     }
 })
 
@@ -70,7 +70,83 @@ router.get('/', async (req, res) => {
         res.send(result.rows)
     }catch (err)
     {
-        res.status(400).send({ message: "Failed" })
+        res.status(400).send({ message: "Failed", error: err })
+    }
+})
+
+// router.post('/return', async (req, res) => {
+//     try
+//     {
+//         const product_id = req.body.product_id
+//         const customer_id = req.body.customer_id
+//         const quantity = req.body.quantity
+//         // const desciption = req.body.description
+//         const return_to = req.body.return_to
+
+//         const result = await pool.query(`INSERT INTO "return" values ('${product_id}', ${return_to}, ${quantity}, current_date, 1)`)
+
+//         res.send(result)
+//     }catch(err)
+//     {
+//         console.log(err)
+//         res.status(400).send({ message: 'Failed' })
+//     }
+// })
+
+router.post('/update', async (req, res) => {
+    try
+    {
+        const product_id = req.body.product_id
+        const from = req.body.from
+        const to = req.body.to
+        const quantity = req.body.quantity
+
+        const result = await pool.query(`SELECT * FROM product WHERE warehouse_id=${from} AND id='${product_id}'`)
+
+        if(result.rowCount !== 0)
+        {
+            if(result.rows[0].quantity < quantity)
+            {
+                res.status(400).send({
+                    message: 'Insufficient quantity',
+                    require_quantity: quantity,
+                    available_quantity: result.rows[0].quantity
+                })
+            }else{
+                const result2 = await pool.query(`UPDATE product SET quantity=quantity-${quantity} WHERE id='${product_id}' AND warehouse_id=${from}`)
+
+                try
+                {
+                    if(result2.rowCount !== 0)
+                    {
+                        const result3 = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id='${product_id}' AND warehouse_id=${to};
+                                                    INSERT INTO product SELECT '${product_id}', ${to}, ${quantity}, current_date
+                                                    WHERE NOT EXISTS (SELECT 1 FROM product WHERE id='${product_id}' AND warehouse_id=${to});
+                                                    SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
+                        
+                        res.status(200).send({
+                            message: 'Success',
+                            move_quantity: quantity,
+                            result: { 
+                                move_from: {
+                                    warehouse_id: from,
+                                    new_quantity: result.rows[0].quantity - quantity
+                                },
+                                move_to: {
+                                    warehouse_id: to,
+                                    new_quantity: result3[2].rows[0].quantity
+                                }
+                            } })
+                    }
+                }catch(err)
+                {
+                    res.status(400).send({ message: 'Failed', error: err })
+                }
+            }
+        }
+    }catch(err)
+    {
+        res.status(400).send({ message: 'Failed', error: err })
     }
 })
 

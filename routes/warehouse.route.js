@@ -25,7 +25,7 @@ router.get('/:warehouse', async (req, res) => {
         res.status(200).send(list)
     }catch (err)
     {
-        res.status(400).send({ message: "Failed" })
+        res.status(400).send({ message: "Failed", error: err })
     }
 })
 
@@ -63,7 +63,7 @@ router.get('/profit/:warehouse', async (req, res) => {
         }))
     }catch (err)
     {
-        res.status(400).send({ message: 'Failed' })
+        res.status(400).send({ message: 'Failed', error: err })
     }
 })
 
@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
         res.send(list)
     }catch (err)
     {
-        res.send(err)
+        res.status(400).send({ message: 'Failed', error: err })
     }
 })
 
