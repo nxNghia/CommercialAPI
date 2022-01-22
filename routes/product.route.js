@@ -106,7 +106,7 @@ router.post('/add', async (req, res) => {
         const result = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id=${product_id} AND warehouse_id=${to};
                                         INSERT INTO product SELECT ${product_id}, ${to}, ${quantity}, current_date
                                         WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
-                                        SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
+                                        SELECT * FROM product WHERE id=${product_id} AND warehouse_id=${to}`)
 
         res.status(200).send({
             message: 'Success', 
