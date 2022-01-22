@@ -104,7 +104,7 @@ router.post('/add', async (req, res) => {
         const quantity = req.body.quantity
 
         const result = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id=${product_id} AND warehouse_id=${to};
-                                        INSERT INTO product SELECT ${product_id}, ${to}, ${quantity}, current_date
+                                        INSERT INTO product (id, warehouse_id, quantity, last_update) SELECT ${product_id}, ${to}, ${quantity}, current_date
                                         WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
                                         SELECT * FROM product WHERE id=${product_id} AND warehouse_id=${to}`)
 
@@ -150,7 +150,7 @@ router.post('/update', async (req, res) => {
                     if(result2.rowCount !== 0)
                     {
                         const result3 = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id=${product_id} AND warehouse_id=${to};
-                                                    INSERT INTO product SELECT ${product_id}, ${to}, ${quantity}, current_date
+                                                    INSERT INTO product (id, warehouse_id, quantity, last_update) SELECT ${product_id}, ${to}, ${quantity}, current_date
                                                     WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
                                                     SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
                         
