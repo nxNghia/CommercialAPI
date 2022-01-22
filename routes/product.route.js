@@ -22,7 +22,10 @@ router.get('/getById/:id', async (req, res) => {
             WHERE P.id=${product_id} AND P.warehouse_id = W.id`)
         
         const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
-        res.status(200).send(list)
+
+        const total = list.reduce((current_value, next_value) => current_value + next_value.quantity, 0)
+
+        res.status(200).send({details: list, total: total})
     }catch (err)
     {
         res.status(400).send({ message: "Failed", error: err })
