@@ -96,6 +96,33 @@ router.get('/', async (req, res) => {
 //     }
 // })
 
+router.post('/add', async (req, res) => {
+    try
+    {
+        const product_id = req.body.id
+        const to = req.body.to
+        const quantity = req.body.quantity
+
+        const result = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id=${product_id} AND warehouse_id=${to};
+                                        INSERT INTO product SELECT ${product_id}, ${to}, ${quantity}, current_date
+                                        WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
+                                        SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
+
+        res.status(200).send({
+            message: 'Success', 
+            product: {
+                id: product_id,
+                last_quantity: result[2].rows[0].quantity - quantity,
+                new_quantity: result[2].rows[0].quantity,
+                date: result[2].rows[0].last_update
+            }
+        })
+    }catch(err)
+    {
+        res.status(400).send({ message: 'Failed', error: err })
+    }
+})
+
 router.post('/update', async (req, res) => {
     try
     {
