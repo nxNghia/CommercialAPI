@@ -19,7 +19,7 @@ router.get('/getById/:id', async (req, res) => {
             res.status(400).send({ message: "Parameter contains space" })
 
         const result = await pool.query(`SELECT P.id, P.quantity, P.warehouse_id, W.name, P.last_update FROM product AS P, warehouse AS W
-            WHERE P.id='${product_id}' AND P.warehouse_id = W.id`)
+            WHERE P.id=${product_id} AND P.warehouse_id = W.id`)
         
         const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
         res.status(200).send(list)
@@ -101,7 +101,7 @@ router.post('/update', async (req, res) => {
         const to = req.body.to
         const quantity = req.body.quantity
 
-        const result = await pool.query(`SELECT * FROM product WHERE warehouse_id=${from} AND id='${product_id}'`)
+        const result = await pool.query(`SELECT * FROM product WHERE warehouse_id=${from} AND id=${product_id}`)
 
         if(result.rowCount !== 0)
         {
@@ -113,15 +113,15 @@ router.post('/update', async (req, res) => {
                     available_quantity: result.rows[0].quantity
                 })
             }else{
-                const result2 = await pool.query(`UPDATE product SET quantity=quantity-${quantity} WHERE id='${product_id}' AND warehouse_id=${from}`)
+                const result2 = await pool.query(`UPDATE product SET quantity=quantity-${quantity} WHERE id=${product_id} AND warehouse_id=${from}`)
 
                 try
                 {
                     if(result2.rowCount !== 0)
                     {
-                        const result3 = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id='${product_id}' AND warehouse_id=${to};
-                                                    INSERT INTO product SELECT '${product_id}', ${to}, ${quantity}, current_date
-                                                    WHERE NOT EXISTS (SELECT 1 FROM product WHERE id='${product_id}' AND warehouse_id=${to});
+                        const result3 = await pool.query(`UPDATE product SET quantity=quantity+${quantity} WHERE id=${product_id} AND warehouse_id=${to};
+                                                    INSERT INTO product SELECT ${product_id}, ${to}, ${quantity}, current_date
+                                                    WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
                                                     SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
                         
                         res.status(200).send({
