@@ -183,4 +183,114 @@ router.post('/update', async (req, res) => {
     }
 })
 
+router.post('/discard', async (req, res) => {
+    const product_id = req.body.product_id
+    const quantity = req.body.quantity
+
+    try
+    {
+        const result = await pool.query(`SELECT * FROM product WHERE id=${product_id} ORDER BY quantity DESC`)
+
+        const warehouses = result.rows.map(row => ({ warehouse_id: row.warehouse_id, quantity: row.quantity }))
+        warehouses.push({ warehouse_id: -1, quantity: 0 })
+
+        const converted_arr = warehouses.map(warehouse => ({ warehouse_id: warehouse.warehouse_id, quantity:  warehouses[0].quantity - warehouse.quantity }))
+        
+        let sum = 0
+        let max_columns = 0
+        let last_value = 0
+        let current_sum = 0
+
+        //find minimum warehouses to get enough products
+        converted_arr.every((warehouse, index) => {
+            sum += (warehouse.quantity - last_value) * index
+
+            last_value = warehouse.quantity
+
+            if (sum >= quantity)
+            {
+                max_columns = index
+                return false
+            }
+
+            return true
+        })
+
+        if (sum < quantity)
+        {
+            res.status(400).send({ message: 'Insufficent quantity', required_quantity: quantity, available_quantity: sum })
+        }else{
+            const tt = warehouses.reduce((current_value, next_value, current_index) =>
+                        current_index > max_columns ? current_value + 0 : current_value + next_value.quantity - warehouses[max_columns].quantity, 0)
+
+            warehouses.every((warehouse, index) => {
+                if (index === max_columns)
+                    return false
+
+                if (current_sum + Math.floor((warehouse.quantity - warehouses[max_columns].quantity) / tt * quantity) + 1 >= quantity)
+                {
+                    warehouse.quantity -= (quantity - current_sum)
+                    return false
+                }else{
+                    if (Math.floor((warehouse.quantity - warehouses[max_columns].quantity) / tt * quantity) + 1 > warehouse.quantity)
+                    {
+                        current_sum += warehouse.quantity
+                        warehouse.quantity = 0
+                    }else{
+                        current_sum += Math.floor((warehouse.quantity - warehouses[max_columns].quantity) / tt * quantity) + 1
+                        warehouse.quantity -= Math.floor((warehouse.quantity - warehouses[max_columns].quantity) / tt * quantity) + 1
+                    }
+                }
+
+                return true
+            })
+
+            const update_list = []
+            
+            warehouses.splice(-1)
+
+            warehouses.forEach(warehouse => {
+                const update_promise = new Promise((resolve, reject) => {
+                    pool.query(`UPDATE product SET quantity=${warehouse.quantity} WHERE warehouse_id=${warehouse.warehouse_id} AND id=${product_id}`).then(result3 => {
+                        resolve(result3)
+                    })
+                })
+
+                update_list.push(update_promise)
+            })
+
+            Promise.all(update_list).then(() => res.status(200).send({ message: 'Success', products_left: warehouses }))
+        }
+    }catch(err)
+    {
+        res.status(400).send({ message: 'Failed', error: {...err} })
+    }
+})
+
+router.post('/remove', async (req, res) => {
+    const product_id = req.body.product_id
+
+    try
+    {
+        const result = await pool.query(`SELECT id, SUM(quantity) AS quantity FROM product GROUP BY id HAVING id=${product_id};
+                                        DELETE FROM product WHERE id=${product_id} AND EXISTS (SELECT id, SUM(quantity) AS quantity FROM product
+                                        GROUP BY id HAVING id=${product_id} AND SUM(quantity)=0)`)
+        
+        if (result[1].rowCount !== 0)
+        {
+            res.status(200).send({ message: 'Success' })
+        }else{
+            if (result[0].rowCount === 0)
+            {
+                res.status(400).send({ message: 'Invalid product id', id: product_id })
+            }else{
+                res.status(400).send({ message: 'Quantity of product is not 0', quantity: result[0].rows[0].quantity })
+            }
+        }  
+    }catch(err)
+    {
+        res.status(400).send({ message: 'Failed' })
+    }
+})
+
 module.exports = router
