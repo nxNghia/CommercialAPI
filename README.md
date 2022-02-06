@@ -1,52 +1,30 @@
 # Structure progamming
 ## API for ABC shopwear
+## Prerequisite
+1. NodeJS v14.x
+2. PostgreSQL
+## Installation
+1. Clone repository
+```
+git clone https://github.com/nxNghia/CommercialAPI.git
+```
+2. Packages installation
+```
+npm install
+```
+3. Create an .env file in root
+```
+NODE_ENV=develop
+PG_USER=<Your postgres username>
+PG_PASSWORD=<Your postgres password>
+PG_HOST=localhost
+PG_DATABASE=<Your database's name>
+PG_PORT=5432
+```
+4. Install postgreSQL [Link](https://www.postgresql.org/)
+5. Restore with [BackupLink](https://drive.google.com/file/d/1e7cfmw5J6198xcvwRs3cq5zvJqRo5eE7/view?usp=sharing)
 ## Usage
-```bash
-- Information of products that are stored in a particular warehouse
-- GET: /statistics/warehouse/:warehouse_id
-- Example: /statistics/warehouse/123
+run with
 ```
-
-```bash
-- For transferring purpose, this api return information of particular product that stored in other warehouses
-- GET: /statistics/product/:id/:warehouse
-- Example: /statistics/product/1234/123
-```
-
-```bash
-- Information about returned products
-- GET: /statistics/product/returned
-```
-
-```bash
-- Profit correspond to each warehouse
-- GET: /statistics/profit/:warehouse
-- Example: /statistics/profit/123
-```
-
-```bash
-- Information of every warehouses
-- GET: /warehouse
-```
-
-```bash
-- Total quantity of each product, which is stored in every warehouse
-- GET: /statistics/product
-```
-
-```bash
-- Add product into a warehouse
-- POST: /product/add
-- body: {
-    id: "",
-    name: "",
-    type: "",
-    price: "",
-    description: "",
-    size: "",
-    image: "",
-    video: "",
-    color: "",
-    quantity: "",
-}
+npm run dev
 ```
