@@ -21,7 +21,7 @@ const getWarehouseById = async (request, response, next) => {
         response.status(200).send(list)
     }catch (err)
     {
-        response.status(400).send({ message: "Failed", error: err })
+        response.status(400).send({ message: "Failed", ...err })
     }
 }
 
@@ -55,7 +55,7 @@ const getWarehouseProfit = async (request, response, next) => {
         }))
     }catch (err)
     {
-        res.status(400).send({ message: 'Failed', error: err })
+        res.status(400).send({ message: 'Failed', ...err })
     }
 }
 
@@ -69,7 +69,7 @@ const getWarehouses = async (request, response, next) => {
         response.send(list)
     }catch (err)
     {
-        response.status(400).send({ message: 'Failed', error: err })
+        response.status(400).send({ message: 'Failed', ...err })
     }
 }
 

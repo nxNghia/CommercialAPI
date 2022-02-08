@@ -1,15 +1,12 @@
+const { default: axios } = require('axios')
 const Product = require('../models/product.model')
 
 const convertDate = (date) => {
+    if (!date)
+        return "NaN"
     const _date = new Date(date)
 
     return _date.getDate() + '/' + (_date.getMonth() + 1) + '/' + _date.getFullYear()
-}
-
-const reasonConstances = {
-    1: 'Không nguyên vẹn',
-    2: 'Không nhận hàng',
-    3: 'Đổi hàng'
 }
 
 const productGetById = async (request, response, next) => {
@@ -29,33 +26,29 @@ const productGetById = async (request, response, next) => {
         response.status(200).send({details: list, total: total})
     }catch (err)
     {
-        response.status(400).send({ message: "Failed", error: err })
+        response.status(400).send({ message: "Failed", ...err })
     }
 }
 
 const productReturned = async (request, response, next) => {
     try
     {
-        const result = await Product.getReturn()
-        // const result = await pool.query(`SELECT * FROM "return" ORDER BY date DESC`)
+        const result = await axios.get('https://blooming-savannah-55194.herokuapp.com/api/v1/return_products')
     
         const returnedList = []
-        result?.rows.forEach(product => {
+        result.data.data.forEach(product => {
             returnedList.push({
                 product_id: product.product_id,
-                return_to: product.return_to,
-                reason: {
-                    value: product.reason,
-                    text: reasonConstances[product.reason]
-                },
+                return_to: product.to,
+                reason: product.description,
                 quantity: product.quantity,
-                date: convertDate(product.date)
+                date: convertDate(product.created_at)
             })
         });
 
         response.status(200).send(returnedList)
     }catch (err) {
-        response.status(400).send({ message: "Failed", error: err })
+        response.status(400).send({ message: "Failed", ...err })
     }
 }
 
@@ -67,7 +60,7 @@ const productsGet = async (request, response, next) => {
         response.send(result.rows)
     }catch (err)
     {
-        response.status(400).send({ message: "Failed", error: err })
+        response.status(400).send({ message: "Failed", ...err })
     }
 }
 
@@ -79,10 +72,6 @@ const productAdd = async (request, response, next) => {
         const quantity = request.body.quantity
 
         const result = await Product.add(product_id, quantity, to)
-        // const result = await pool.query(`UPDATE product SET quantity=quantity+${quantity}, last_update=current_date WHERE id=${product_id} AND warehouse_id=${to};
-                                        // INSERT INTO product (id, warehouse_id, quantity, last_update) SELECT ${product_id}, ${to}, ${quantity}, current_date
-                                        // WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
-                                        // SELECT * FROM product WHERE id=${product_id} AND warehouse_id=${to}`)
 
         response.status(200).send({
             message: 'Success', 
@@ -96,7 +85,7 @@ const productAdd = async (request, response, next) => {
         })
     }catch(err)
     {
-        response.status(400).send({ message: 'Failed', error: err })
+        response.status(400).send({ message: 'Failed', ...err })
     }
 }
 
@@ -108,7 +97,6 @@ const productUpdate = async (request, response, next) => {
         const to = request.body.to
         const quantity = request.body.quantity
 
-        // const result = await pool.query(`SELECT * FROM product WHERE warehouse_id=${from} AND id=${product_id}`)
         const query = `SELECT * FROM product WHERE warehouse_id=${from} AND id=${product_id}`
         const result = await Product.queryExec(query)
 
@@ -124,17 +112,12 @@ const productUpdate = async (request, response, next) => {
             }else{
                 const query = `UPDATE product SET quantity=quantity-${quantity} WHERE id=${product_id} AND warehouse_id=${from}`
                 const result2 = await Product.queryExec(query)
-                // const result2 = await pool.query(`UPDATE product SET quantity=quantity-${quantity} WHERE id=${product_id} AND warehouse_id=${from}`)
 
                 try
                 {
                     if(result2.rowCount !== 0)
                     {
                         const result3 = await Product.update(product_id, quantity, to)
-                        // const result3 = await pool.query(`UPDATE product SET quantity=quantity+${quantity}, last_update=current_date WHERE id=${product_id} AND warehouse_id=${to};
-                                                    // INSERT INTO product (id, warehouse_id, quantity, last_update) SELECT ${product_id}, ${to}, ${quantity}, current_date
-                                                    // WHERE NOT EXISTS (SELECT 1 FROM product WHERE id=${product_id} AND warehouse_id=${to});
-                                                    // SELECT * FROM product WHERE id='${product_id}' AND warehouse_id=${to}`)
                         
                         response.status(200).send({
                             message: 'Success',
@@ -162,7 +145,7 @@ const productUpdate = async (request, response, next) => {
         }
     }catch(err)
     {
-        response.status(400).send({ message: 'Failed', error: err })
+        response.status(400).send({ message: 'Failed', ...err })
     }
 }
 
@@ -172,7 +155,6 @@ const productDiscard = async (request, response, next) => {
         const product_id = request.body.product_id
         const quantity = request.body.quantity
 
-        // const result = await pool.query(`SELECT * FROM product WHERE id=${product_id} ORDER BY quantity DESC`)
         const query = `SELECT * FROM product WHERE id=${product_id} ORDER BY quantity DESC`
         const result = await Product.queryExec(query)
         
@@ -236,10 +218,6 @@ const productDiscard = async (request, response, next) => {
 
             warehouses.forEach(warehouse => {
                 const update_promise = new Promise( async (resolve, reject) => {
-                    // pool.query(`UPDATE product SET quantity=${warehouse.quantity} WHERE warehouse_id=${warehouse.warehouse_id} AND id=${product_id}`).then(result3 => {
-                    //     resolve(result3)
-                    // })
-
                     const result3 = await Product.discard(warehouse, product_id)
                     resolve(result3)
                 })
@@ -251,7 +229,7 @@ const productDiscard = async (request, response, next) => {
         }
     }catch(err)
     {
-        response.status(400).send({ message: 'Failed', error: {...err} })
+        response.status(400).send({ message: 'Failed', ...err })
     }
 }
 
@@ -261,9 +239,6 @@ const productRemove = async (request, response, next) => {
         const product_id = request.body.product_id
 
         const result = await Product.remove(product_id)
-        // const result = await pool.query(`SELECT id, SUM(quantity) AS quantity FROM product GROUP BY id HAVING id=${product_id};
-                                        // DELETE FROM product WHERE id=${product_id} AND EXISTS (SELECT id, SUM(quantity) AS quantity FROM product
-                                        // GROUP BY id HAVING id=${product_id} AND SUM(quantity)=0)`)
         
         if (result[1].rowCount !== 0)
         {
@@ -278,7 +253,7 @@ const productRemove = async (request, response, next) => {
         }  
     }catch(err)
     {
-        response.status(400).send({ message: 'Failed' })
+        response.status(400).send({ message: 'Failed', ...err })
     }
 }
 
