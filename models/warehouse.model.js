@@ -7,7 +7,7 @@ const getById = async (warehouse_id) => {
 }
 
 const getProfit = async (warehouse_id) => {
-    const result = await pool.query(`SELECT product_id, quantity FROM "export" AS E, export_detail WHERE E.from=${warehouse_id} AND E.id = export_detail.export_id`)
+    const result = await pool.query(`SELECT product_id, quantity FROM "export" AS E, export_detail WHERE E.from=${warehouse_id} AND E.to=1 AND E.id = export_detail.export_id`)
 
     return result
 }

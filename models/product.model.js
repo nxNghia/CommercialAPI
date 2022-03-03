@@ -1,5 +1,5 @@
-const { default: axios } = require('axios')
 const pool = require('../database')
+const productAPI = require('../api/product')
 
 const getById = async (product_id) => {
     const result = await pool.query(`SELECT P.id, P.quantity, P.warehouse_id, W.name, P.last_update FROM product AS P, warehouse AS W
@@ -16,8 +16,8 @@ const getReturn = async () => {
 
 const get = async () => {
     const result = await pool.query(`SELECT id, SUM(quantity) as quantity FROM product GROUP BY id`)
-    
-    return result
+
+    return result.rows
 }
 
 const add = async (product_id, quantity, to) => {
@@ -52,9 +52,13 @@ const remove = async (product_id) => {
 }
 
 const getInformation = async (product_id) => {
-    const result = await axios.get(`https://laptrinhcautrucapi.herokuapp.com/product/id?id=${product_id}`)
-
-    return result
+    const result1 = await productAPI.api11(product_id)
+    if (result1)
+        return result1
+    else{
+        const result2 = await productAPI.api17(product_id)
+        return result2[0]
+    } 
 }
 
 const queryExec = async (query) => {

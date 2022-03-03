@@ -17,7 +17,11 @@ const getWarehouseById = async (request, response, next) => {
 
         const result = await Warehouse.getById(warehouse_id)
 
-        const list = result?.rows.map(item => ({...item, last_update: convertDate(item.last_update)}))
+        const list = await Promise.all(result?.rows.map(async (item) => {
+            const info = await Product.getInformation(item.id)
+
+            return {...item, last_update: convertDate(item.last_update), name: info.name}
+        }))
         response.status(200).send(list)
     }catch (err)
     {
@@ -41,14 +45,14 @@ const getWarehouseProfit = async (request, response, next) => {
             const product_info = new Promise(async (resolve, reject) => {
 
                 const info = await Product.getInformation(product.product_id)
-                resolve({...info.data[0], profit: product.quantity * info.data[0].price, quantity: product.quantity})
+                resolve({...product, profit: product.quantity * info.price, quantity: product.quantity, name: info.name, price: info.price})
             })
 
             products.push(product_info)
         })
 
         Promise.all(products).then(result => response.status(200).send({
-            product: result.map(r => ({id: r.id, name: r.name, profit: r.profit, quantity: r.quantity})),
+            product: result.map(r => ({id: r.product_id, name: r.name, profit: r.profit, quantity: r.quantity, price: r.price})),
             total: result.reduce((current, next) => {
                 return current + next.profit
             }, 0)

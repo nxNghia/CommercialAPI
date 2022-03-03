@@ -1,4 +1,5 @@
 const { default: axios } = require('axios')
+const productAPI = require('../api/product')
 const Product = require('../models/product.model')
 
 const convertDate = (date) => {
@@ -42,11 +43,17 @@ const productReturned = async (request, response, next) => {
                 return_to: product.to,
                 reason: product.description,
                 quantity: product.quantity,
-                date: convertDate(product.created_at)
+                date: convertDate(product.created_at),
+                customer: product.customer_id
             })
         });
 
-        response.status(200).send(returnedList)
+        const fullInfo = await Promise.all(returnedList.map(async (item) => {
+            const info = await Product.getInformation(item.product_id)
+            return { ...item, name: info.name }
+        }))
+
+        response.status(200).send(fullInfo)
     }catch (err) {
         response.status(400).send({ message: "Failed", ...err })
     }
@@ -56,8 +63,23 @@ const productsGet = async (request, response, next) => {
     try
     {
         const result = await Product.get()
+
+        console.log(result.rows)
+
+        const list1 = await productAPI.api11('')
+        const list2 = await productAPI.api17getAll()
+
+        const product_map = new Map()
+        
+        list1.forEach(item => {
+            product_map.set(item.id, { id: item.id, name: item.name, quantity: item.quantity })
+        });
+
+        list2.forEach(item => {
+            product_map.set(item.id, { id: item.id, name: item.name, quantity: item.quantity })
+        })
     
-        response.send(result.rows)
+        response.status(200).send(result.map(item => ({ ...item, name: product_map.get(item.id).name })))
     }catch (err)
     {
         response.status(400).send({ message: "Failed", ...err })
